@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - run: sudo xcode-select -s /Applications/Xcode_11.4.app/Contents/Developer
-      - name: Xcodebuild Action
+      # - name: Xcodebuild Action
       - uses: sersoft-gmbh/xcodebuild-action@v1.1
         with:
           # The path to the xcworkspace to build. Mutually exclusive with `project`.
