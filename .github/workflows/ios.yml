@@ -14,7 +14,7 @@ jobs:
       uses: sersoft-gmbh/xcodebuild-action@v1.1
       with:
         # The path to the xcworkspace to build. Mutually exclusive with `project`.
-        workspace: ./UniPlugin-JVerification-iOS/HBuilder-uniPluginDemo
+        workspace: UniPlugin-JVerification-iOS/HBuilder-uniPluginDemo
         # The path to the xcodeproj to build. Mutually exclusive with `workspace`.
         scheme: "JVerification"
         destination: platform=macOS
