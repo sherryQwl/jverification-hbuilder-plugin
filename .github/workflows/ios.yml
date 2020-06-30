@@ -28,7 +28,7 @@ jobs:
             use-xcpretty: false
     steps:
       - run: sudo xcode-select -s /Applications/Xcode_11.4.app/Contents/Developer
-      - name: Xcodebuild Action
+      #- name: Xcodebuild Action
       - uses: actions/checkout@v2
       - uses: sherryQwl/jverification-hbuilder-plugin@jg
         with:
