@@ -7,7 +7,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - name: Xcodebuild Action
@@ -17,4 +17,5 @@ jobs:
         workspace: ./UniPlugin-JVerification-iOS/HBuilder-uniPluginDemo
         # The path to the xcodeproj to build. Mutually exclusive with `workspace`.
         scheme: "JVerification"
+        destination: platform=macOS
         
