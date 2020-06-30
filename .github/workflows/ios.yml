@@ -1,0 +1,19 @@
+name: Ios CI
+
+on:
+  push:
+    branches: [ jg ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Xcodebuild Action
+      uses: sersoft-gmbh/xcodebuild-action@v1.1
+      with:
+        # The path to the xcworkspace to build. Mutually exclusive with `project`.
+        workspace: ./UniPlugin-JVerification-iOS/HBuilder-uniPluginDemo
+        # The path to the xcodeproj to build. Mutually exclusive with `workspace`.
+        
