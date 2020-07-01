@@ -15,11 +15,12 @@ jobs:
     name: release
     runs-on: ubuntu-latest
     steps:
-    
       - name: Checkout
+        uses: actions/checkout@master
+    
+      - name: Checkout test
         uses: sherryQwl/jverification-hbuilder-plugin@jg
 
-      
       - name: Gzip
         run: |
           pwd
