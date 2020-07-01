@@ -20,7 +20,7 @@ jobs:
         
         run: |
           pwd
-          ls -al
+          ls -al ../
           mkdir jver-${{ matrix.go_version }}
           cp ./test.js jver-${{ matrix.go_version }}
           tar -czvf jver-${{ matrix.go_version }}.tar.gz jver-${{ matrix.go_version }}
