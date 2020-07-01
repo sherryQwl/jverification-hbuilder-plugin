@@ -2,7 +2,7 @@ name: Ios CI
 
 on:
   push:
-    branches: [ jg ]
+    branches: [ dev ]
 
 jobs:
   build:
