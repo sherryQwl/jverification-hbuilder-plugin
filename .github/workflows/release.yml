@@ -22,9 +22,9 @@ jobs:
         run: |
           pwd
           ls -al 
-          mkdir jver-${{ matrix.go_version }}
-          cp -r /jverification-hbuilder-plugin/nativeplugins/JG-JVerification/ jver-${{ matrix.version }}
-          tar -czvf jver-${{ matrix.go_version }}.tar.gz jver-${{ matrix.version }}
+          mkdir jver-${{ matrix.version }}
+          cp jverification-hbuilder-plugin/nativeplugins/JG-JVerification/ jver-${{ matrix.version }}
+          tar -czvf jver-${{ matrix.version }}.tar.gz jver-${{ matrix.version }}
           
 
       - name: Upload to release
