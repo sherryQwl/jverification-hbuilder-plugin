@@ -23,7 +23,7 @@ jobs:
           pwd
           ls -al 
           mkdir jver-${{ matrix.version }}
-          cp jverification-hbuilder-plugin/nativeplugins/JG-JVerification/ jver-${{ matrix.version }}
+          cp nativeplugins/JG-JVerification/ jver-${{ matrix.version }}
           tar -czvf jver-${{ matrix.version }}.tar.gz jver-${{ matrix.version }}
           
 
