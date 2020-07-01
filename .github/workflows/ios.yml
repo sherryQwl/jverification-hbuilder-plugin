@@ -19,6 +19,7 @@ jobs:
     steps:
       - run: sudo xcode-select -s /Applications/Xcode_11.4.app/Contents/Developer
       - uses: actions/checkout@v2
+      - uses: sersoft-gmbh/xcodebuild-action@master
         with:
           # The path to the xcworkspace to build. Mutually exclusive with `project`.
           project: UniPlugin-JVerification-iOS/HBuilder-uniPluginDemo/HBuilder-uniPlugin.xcodeproj
@@ -31,3 +32,14 @@ jobs:
       - run: ls -al
       - run: find `pwd` -name "*.framework"
       - run: find / -name "*.framework"
+        
+      - name: Check executed command
+        run: |
+          EXPECTED_COMMAND="xcodebuild -workspace ${{matrix.workspace}} -scheme ${{matrix.scheme}} -destination ${{matrix.destination}} -configuration ${{matrix.configuration}}"
+          if [ "${{matrix.use-xcpretty}}" == "true" ]; then
+            EXPECTED_COMMAND="${EXPECTED_COMMAND} | xcpretty"
+          fi
+          if [ "${EXPECTED_COMMAND}" != "${{steps.xcodebuild.outputs.executed-command}}" ]; then
+            printf "::error::Executed command did not match expectations!\nExecuted: ${{steps.xcodebuild.outputs.executed-command}}\nExpected: ${EXPECTED_COMMAND}\n"
+            exit 1
+          fi
