@@ -18,9 +18,9 @@ jobs:
       
       - name: Gzip
         run: |
-          mkdir jver-${{ matrix.os }}
-          cp ../../jverification-hbuilder-plugin/nativeplugins/JG-JVerification/ jver-${{ matrix.os }}
-          tar -czvf jver-${{ matrix.os }}.tar.gz jver-${{ matrix.os }}
+          mkdir jver-${{ matrix.go_version }}
+          cp /jverification-hbuilder-plugin/nativeplugins/JG-JVerification/ jver-${{ matrix.go_version }}
+          tar -czvf jver-${{ matrix.go_version }}.tar.gz jver-${{ matrix.go_version }}
           
 
       - name: Upload to release
