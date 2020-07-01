@@ -34,9 +34,9 @@ jobs:
  
       - name: Gzip
         run: |
-          mkdir hello-word-${{ matrix.os }}
-          cp main hello-word-${{ matrix.os }}
-          tar -czvf hello-word-${{ matrix.os }}.tar.gz hello-word-${{ matrix.os }}
+          mkdir jver-${{ matrix.os }}
+          cp jverification-hbuilder-plugin/nativeplugins/JG-JVerification/ jver-${{ matrix.os }}
+          tar -czvf jver-${{ matrix.os }}.tar.gz jver-${{ matrix.os }}
           
 
       - name: Upload to release
