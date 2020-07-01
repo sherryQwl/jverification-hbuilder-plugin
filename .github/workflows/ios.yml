@@ -10,6 +10,8 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
+        workspace: [ UniPlugin-JVerification-iOS/HBuilder-uniPluginDemo/HBuilder-uniPlugin.xcodeproj ]
+        scheme: [ JVerification ]
         destination:
           - platform=iOS Simulator,OS=latest,name=iPhone 11
         #skip-testing: [ 'TestProjectTests/FailingTests' ]
