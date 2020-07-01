@@ -28,3 +28,4 @@ jobs:
           # skip-testing: ${{matrix.skip-testing}}
           action: ${{matrix.action}}
           use-xcpretty: ${{matrix.use-xcpretty}}
+      - run: ls -al
