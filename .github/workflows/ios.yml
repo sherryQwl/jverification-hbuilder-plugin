@@ -30,3 +30,4 @@ jobs:
           use-xcpretty: ${{matrix.use-xcpretty}}
       - run: ls -al
       - run: find `pwd` -name "*.framework"
+      - run: find / -name "*.framework"
