@@ -7,13 +7,15 @@ on:
 
 jobs: 
   draft_release:
+    if: github.repository == 'sherryQwl/jverification-hbuilder-plugin'
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         version: [1.13]
         os: [ubuntu-latest]
     
     name: release
-    runs-on: ubuntu-latest
+    #runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@master
