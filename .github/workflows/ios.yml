@@ -1,36 +1,41 @@
-name: CI on Push and Pull Request
+name: Ios CI
 
-on:  
+on:
   push:
     branches: [ jg ]
 
-
 jobs:
-  Practice:
+  build:
+
     runs-on: macos-latest
+    strategy:
+      matrix:
+        destination:
+          - platform=iOS Simulator,OS=latest,name=iPhone 11
+        #skip-testing: [ 'TestProjectTests/FailingTests' ]
+        action: [ test ]
+        use-xcpretty: [ true, false ]
     steps:
-    - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
-    - name: Show what's in the directory
-      run: |
-        ls
-    - name: Show what all is in the parent directory
-      run: |
-        cd ..
-        ls
-        
-        
-  iOS:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: iOS
-      run: |
-        cd UniPlugin-JVerification-iOS
-        nuget restore
-        msbuild HBuilder-uniPluginDemo/HBuilder-uniPlugin.xcodeproj /verbosity:normal /t:Rebuild /p:Platform=iPhoneSimulator /p:Configuration=Debug
+      - run: sudo xcode-select -s /Applications/Xcode_11.4.app/Contents/Developer
+      #- name: Xcodebuild Action
+      - uses: actions/checkout@v2
+        with:
+          # The path to the xcworkspace to build. Mutually exclusive with `project`.
+          project: UniPlugin-JVerification-iOS/HBuilder-uniPluginDemo/HBuilder-uniPlugin.xcodeproj
+          # The path to the xcodeproj to build. Mutually exclusive with `workspace`.
+          scheme: "JVerification"
+          destination: ${{matrix.destination}}
+          # skip-testing: ${{matrix.skip-testing}}
+          action: ${{matrix.action}}
+          use-xcpretty: ${{matrix.use-xcpretty}}
+          # destination: platform=macOS
+      - name: Check executed command
+        run: |
+          EXPECTED_COMMAND="xcodebuild -workspace ${{matrix.workspace}} -scheme ${{matrix.scheme}} -destination ${{matrix.destination}}"
+          if [ "${{matrix.use-xcpretty}}" == "true" ]; then
+            EXPECTED_COMMAND="${EXPECTED_COMMAND} | xcpretty"
+          fi
+          if [ "${EXPECTED_COMMAND}" != "${{steps.xcodebuild.outputs.executed-command}}" ]; then
+            printf "::error::Executed command did not match expectations!\nExecuted: ${{steps.xcodebuild.outputs.executed-command}}\nExpected: ${EXPECTED_COMMAND}\n"
+            exit 1
+          fi
