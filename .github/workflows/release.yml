@@ -6,7 +6,7 @@ on:
       - jg # 在 master 分支发生更新时执行此 action
 
 jobs: 
-  draft_release:
+  release:
     if: github.repository == 'sherryQwl/jverification-hbuilder-plugin'
     runs-on: ${{ matrix.os }}
     strategy:
