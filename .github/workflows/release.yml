@@ -28,10 +28,9 @@ jobs:
           cp -r nativeplugins/JG-JVerification jver-${{ matrix.version }}
           tar -czvf jver-${{ matrix.version }}.tar.gz jver-${{ matrix.version }}
           
-
       - name: Upload to release
         uses: JasonEtco/upload-to-release@master
         with:
-          args: jver-${{ matrix.version }}.tar.gz application/octet-stream
+          args: jver-${{ matrix.version }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
