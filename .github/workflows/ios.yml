@@ -11,9 +11,9 @@ jobs:
     strategy:
       matrix:
         destination:
-          - platform=macOS
+          #- platform=macOS
           - platform=iOS Simulator,OS=latest,name=iPhone 11
-          - platform=tvOS Simulator,OS=latest,name=Apple TV 4K
+         # - platform=tvOS Simulator,OS=latest,name=Apple TV 4K
         #skip-testing: [ 'TestProjectTests/FailingTests' ]
         action: [ test ]
         use-xcpretty: [ true, false ]
