@@ -1,0 +1,19 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - jg # 在 master 分支发生更新时执行此 action
+
+jobs:
+  draft_release:
+    name: Draft release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: release-drafter/release-drafter@v5.11.0
+        name: Draft
+        with:
+          name: jverification-hbuilder-plugin/nativeplugins/JG-JVerification
+          args: jver.tar.gz application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
