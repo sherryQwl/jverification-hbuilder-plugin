@@ -34,4 +34,4 @@ jobs:
         with:
           args: jver-${{ matrix.version }}.tar.gz application/octet-stream
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
