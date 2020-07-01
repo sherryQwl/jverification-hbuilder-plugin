@@ -9,21 +9,37 @@ jobs:
   draft_release:
     strategy:
       matrix:
-        go_version: [1.13]
+        version: [1.13]
         os: [ubuntu-latest]
     
     name: release
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Go ${{ matrix.version }}
+        uses: actions/setup-go@v1
+        with:
+          version: ${{ matrix.version }}
+        id: go
+
+      - name: Checkout
+        uses: sherryQwl/jverification-hbuilder-plugin@jg
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+          if [ -f Gopkg.toml ]; then
+              curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+              dep ensure
+          fi
+          
       
       - name: Gzip
-        
         run: |
           pwd
           ls -al ../
-          mkdir jver-${{ matrix.go_version }}
-          cp ./test.js jver-${{ matrix.go_version }}
-          tar -czvf jver-${{ matrix.go_version }}.tar.gz jver-${{ matrix.go_version }}
+          mkdir jver-${{ matrix.version }}
+          cp ./test.js jver-${{ matrix.version }}
+          tar -czvf jver-${{ matrix.version }}.tar.gz jver-${{ matrix.version }}
           
 
       - name: Upload to release
