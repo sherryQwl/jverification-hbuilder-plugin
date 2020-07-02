@@ -4,8 +4,9 @@ node_js:
 script:
   - npm init -y
 before_deploy:
+  #- export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
   - sudo apt-get -y install zip
-  - zip -r jver.zip nativeplugins/ -r
+  - zip -r jver-$TRAVIS_TAG.zip nativeplugins/ -r
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN
