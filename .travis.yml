@@ -1,0 +1,16 @@
+language: node_js
+node_js:
+  - lts/*
+script:
+  - npm init -y
+before_deploy:
+  - sudo apt-get -y install zip
+  - zip -r jver.zip nativeplugins/ -r
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file: 
+    - jver.zip
+  skip_cleanup: true
+  on:
+    branch: jg
