@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - jg # 在 master 分支发生更新时执行此 action
+      - dev # 在 master 分支发生更新时执行此 action
 
 jobs: 
   release:
