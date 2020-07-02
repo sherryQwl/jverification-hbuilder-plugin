@@ -31,6 +31,6 @@ jobs:
       - name: Upload to release
         uses: sherryQwl/upload-to-release@master
         with:
-          args: jver-${{ matrix.version }}.tar.gz
+          args: jver-${{ matrix.version }}.tar.gz application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
