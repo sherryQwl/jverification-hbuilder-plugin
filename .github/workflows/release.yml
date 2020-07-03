@@ -21,9 +21,9 @@ jobs:
       - name: Gzip
         run: |
           ls -al 
-          zip -j jver-${{ matrix.version }}.zip nativeplugins
-       # mkdir jver-${{ matrix.version }}
-       # cp -r nativeplugins jver-${{ matrix.version }}
+           mkdir jver-${{ matrix.version }}
+           cp -r nativeplugins jver-${{ matrix.version }}
+           zip -j jver-${{ matrix.version }}.zip jver-${{ matrix.version }}
          
           
       - name: Create Release
