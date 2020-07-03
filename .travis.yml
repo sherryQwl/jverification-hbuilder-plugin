@@ -1,18 +1,18 @@
-language: node_js
-node_js:
-  - lts/*
-script:
-  - npm init -y
-before_deploy:
-  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
-  - sudo apt-get -y install zip
-  - zip -r jver-$TRAVIS_TAG.zip nativeplugins/ -r
-deploy:
-  provider: releases
-  api_key: $GITHUB_TOKEN
-  file: 
-    - jver-$TRAVIS_TAG.zip
-  skip_cleanup: true
-  on:
-    branch: jg
-    tags: true
+# language: node_js
+# node_js:
+#   - lts/*
+# script:
+#   - npm init -y
+# before_deploy:
+#   - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+#   - sudo apt-get -y install zip
+#   - zip -r jver-$TRAVIS_TAG.zip nativeplugins/ -r
+# deploy:
+#   provider: releases
+#   api_key: $GITHUB_TOKEN
+#   file: 
+#     - jver-$TRAVIS_TAG.zip
+#   skip_cleanup: true
+#   on:
+#     branch: jg
+#     tags: true
