@@ -21,7 +21,7 @@ jobs:
       - name: Gzip
         run: |
           ls -al 
-          zip --junk-paths jver-${{ matrix.version }}.zip nativeplugins
+          zip --junk-paths -r jver-${{ matrix.version }}.zip nativeplugins
        # mkdir jver-${{ matrix.version }}
        # cp -r nativeplugins jver-${{ matrix.version }}
          
