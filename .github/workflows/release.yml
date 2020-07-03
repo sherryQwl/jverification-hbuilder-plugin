@@ -20,9 +20,10 @@ jobs:
       #     zip --junk-paths my-artifact README.md
       - name: Gzip
         run: |
-          pwd
           ls -al 
-          zip --junk-paths jver-${{ matrix.version }} nativeplugins
+          mkdir jver-${{ matrix.version }}
+          cp -r nativeplugins jver-${{ matrix.version }}
+          zip --junk-paths jver-${{ matrix.version }} jver-${{ matrix.version }}
           
       - name: Create Release
         id: create_release
