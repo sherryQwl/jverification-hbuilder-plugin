@@ -21,8 +21,6 @@ jobs:
       - name: Gzip
         run: |
           tar -jcvf jver-${{ matrix.version }}.tar.gz nativeplugins
-           
-         
           
       - name: Create Release
         id: create_release
@@ -30,12 +28,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          
-          tag_name: ${{ github.TRAVIS_TAG }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ matrix.version }}
+          release_name: V ${{ matrix.version }}
           draft: false
           prerelease: false
-           ls -al ${{ github }}
+           ls -al
            
       - name: Upload Release Asset
         id: upload-release-asset 
