@@ -3,8 +3,9 @@ name: Upload Release Asset
 
 on:
   push:
-    tags: 
-      - 'v*'
+    branches: jg
+#     tags: 
+#       - 'v*'
 
 jobs:
   build:
