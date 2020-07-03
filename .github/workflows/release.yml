@@ -4,8 +4,6 @@ name: Upload Release Asset
 on:
   push:
     branches: jg
-#     tags: 
-#       - 'v*'
 
 jobs:
   build:
@@ -13,13 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [ tags ]
+        version: [ 1.1.7 ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      # - name: Build project # This would actually build your project, using zip for an example artifact
-      #   run: |
-      #     zip --junk-paths my-artifact README.md
       - name: Gzip
         run: |
           tar -jcvf jver-${{ matrix.version }}.tar.gz nativeplugins
@@ -34,7 +29,6 @@ jobs:
           release_name: V ${{ matrix.version }}
           draft: false
           prerelease: false
-           ls -al
            
       - name: Upload Release Asset
         id: upload-release-asset 
