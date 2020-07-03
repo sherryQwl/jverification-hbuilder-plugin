@@ -3,7 +3,8 @@ name: Upload Release Asset
 
 on:
   push:
-    branches: jg
+    tags: 
+      - 'v*'
 
 jobs:
   build:
@@ -11,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [ 1.1.5 ]
+        version: [ tags ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
