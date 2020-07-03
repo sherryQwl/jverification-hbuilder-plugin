@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [ TRAVIS_TAG ]
+        version: [ 1.1.0 ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -21,9 +21,7 @@ jobs:
       - name: Gzip
         run: |
           ls -al 
-          zip --junk-paths jver-${{ matrix.version }} nativeplugins
-        #  mkdir jver-${{ matrix.version }}
-        #  cp -r nativeplugins jver-${{ matrix.version }}
+          tar -jcvf jver-${{ matrix.version }}.tar.gz nativeplugins
            
          
           
@@ -33,7 +31,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.TRAVIS_TAG }}
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
