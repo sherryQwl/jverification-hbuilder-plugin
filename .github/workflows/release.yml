@@ -4,7 +4,7 @@ name: Upload Release Asset
 on:
   push:
     tags: 
-      - 'v*'
+      - 'v*.*.*'
  
 
 jobs:
@@ -15,14 +15,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         
-      - name: Get the version
-        id: get_tag_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      # - name: Get the version
+      #   id: get_tag_version
+      #   run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Check output
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: |
+          echo $RELEASE_VERSION
+          echo ${{ steps.vars.outputs.tag }}
         
       - name: Gzip
         run: |
-          tar -jcvf jver-${{ steps.get_version.outputs.VERSION }}.tar.gz nativeplugins
-          echo ${{ steps.get_version.outputs.VERSION }}
+          tar -jcvf jver-${{ steps.vars.outputs.tag }}.tar.gz nativeplugins
+          echo ${{ steps.vars.outputs.tag }}
           
       - name: Create Release
         id: create_release
@@ -30,8 +39,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
-          release_name: V ${{ steps.get_version.outputs.VERSION }}
+          tag_name: ${{ steps.vars.outputs.tag }}
+          release_name: V ${{ steps.vars.outputs.tag }}
           draft: false
           prerelease: false
            
@@ -42,6 +51,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./jver-${{ steps.get_version.outputs.VERSION }}.tar.gz
-          asset_name: jver-${{ steps.get_version.outputs.VERSION }}.tar.gz
+          asset_path: ./jver-${{ steps.vars.outputs.tag }}.tar.gz
+          asset_name: jver-${{ steps.vars.outputs.tag }}.tar.gz
           asset_content_type: application/zip
