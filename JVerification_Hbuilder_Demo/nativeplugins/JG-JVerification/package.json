@@ -2,12 +2,14 @@
 	"name": "JG-JVerification",
 	"id": "JG-JVerification",
 	"version": "1.0.5",
+	"jverification_sdk_release_version": "2.6.4",
+	"hbuilder_sdk_ios": "iOSSDK@2.7.9.80164_20200527",
 	"description": "极光认证Hbuilder插件",
 	"_dp_type":"nativeplugin",
 	"_dp_nativeplugin":{
 		"ios": {
 			"plugins": [{
-				"type": "module", 
+				"type": "module",
 				"name": "JG-JVerification",
 				"class": "JVerificationModule"
 			}],
@@ -31,14 +33,14 @@
 			"resources": [
 				"JVerificationResource.bundle"
 			],
-			"parameters": {  
-                "JPUSH_APPKEY_IOS": {  
-                    "des": "[iOS]极光 portal 配置应用信息时分配的 AppKey",  
-                    "key": "JVerification:APP_KEY"  
+			"parameters": {
+                "JPUSH_APPKEY_IOS": {
+                    "des": "[iOS]极光 portal 配置应用信息时分配的 AppKey",
+                    "key": "JVerification:APP_KEY"
 				},
-				"JPUSH_CHANNEL_IOS": {  
-                    "des": "[iOS]用于统计分发渠道，不需要可填默认值 developer-default",  
-                    "key": "JVerification:CHANNEL"  
+				"JPUSH_CHANNEL_IOS": {
+                    "des": "[iOS]用于统计分发渠道，不需要可填默认值 developer-default",
+                    "key": "JVerification:CHANNEL"
 				}
             }
 		},
@@ -66,18 +68,18 @@
 				"android.permission.VIBRATE",
 				"android.permission.WAKE_LOCK"
 			],
-			"abis": [  
-				"armeabi-v7a",  
+			"abis": [
+				"armeabi-v7a",
 				"arm64-v8a",
-				"x86"  
+				"x86"
 			],
-			"parameters": {  
-                "JPUSH_APPKEY_ANDROID": {  
-                    "des": "[Android]极光 portal 配置应用信息时分配的 AppKey",  
-                    "key": "JPUSH_APPKEY"  
+			"parameters": {
+                "JPUSH_APPKEY_ANDROID": {
+                    "des": "[Android]极光 portal 配置应用信息时分配的 AppKey",
+                    "key": "JPUSH_APPKEY"
 				},
 				"JPUSH_CHANNEL_ANDROID":{
-					"des": "[Android]用于统计分发渠道，不需要可填默认值 developer-default",  
+					"des": "[Android]用于统计分发渠道，不需要可填默认值 developer-default",
                     "key": "JPUSH_CHANNEL"
 				}
             }
