@@ -1,0 +1,207 @@
+name: main work
+
+on:
+  push:
+    # branches: [ jg ]
+    tags:
+      - 'v*.*.*'
+
+jobs:
+
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: variables
+      id: vars
+      run: |
+        echo ::set-output name=ANDROID_WORK_DIR::$GITHUB_WORKSPACE/UniPlugin-JVerification-Android
+        echo ::set-output name=ANDROID_OUTPUT_DIR::$GITHUB_WORKSPACE/UniPlugin-JVerification-Android/uniplugin_jverification/build/outputs/aar
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+        restore-keys: ${{ runner.os }}-gradle
+
+    - name: Build with Gradle
+      run: |
+        cd ${{ steps.vars.outputs.ANDROID_WORK_DIR }}
+        ./gradlew uniplugin_jverification:assembleRelease
+        ls -laR ${{ steps.vars.outputs.ANDROID_OUTPUT_DIR }}
+
+    - name: Upload build asset
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact
+        path: ${{ steps.vars.outputs.ANDROID_OUTPUT_DIR }}
+
+
+  build-ios:
+    runs-on: macOS-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: variables
+      id: vars
+      run: |
+        # echo ::set-output name=PROJECTNAME::HBuilder-uniPlugin
+        echo ::set-output name=FRAMEWORK_NAME::UniPluginJVerification
+        echo ::set-output name=ASSERTS_DIR::$GITHUB_WORKSPACE/assets
+        # get hbuilder sdk filename for ios from package.json
+        echo ::set-output name=HBUILDER_SDK_IOS::$(cat package.json | grep hbuilder_sdk_ios | head -n 1 | cut -d'"' -f4)
+        echo ::set-output name=IOS_OUTPUT_DIR::/tmp/build
+        echo ::set-output name=IOS_WORK_DIR::$GITHUB_WORKSPACE/UniPlugin-JVerification-iOS
+
+    - name: New Folder
+      run: mkdir ${{ steps.vars.outputs.IOS_OUTPUT_DIR }}
+
+    - name: Force XCode 11.3
+      run: sudo xcode-select -switch /Applications/Xcode_11.6.app
+
+    - name: Unzip hbuilder sdk
+      run: unzip ${{ steps.vars.outputs.ASSERTS_DIR }}/${{ steps.vars.outputs.HBUILDER_SDK_IOS }}.zip -d ${{ steps.vars.outputs.IOS_WORK_DIR }}
+    - name: xcodebuild
+      run: |
+        cd ${{ steps.vars.outputs.IOS_WORK_DIR }}/HBuilder-uniPluginDemo/${{ steps.vars.outputs.FRAMEWORK_NAME }}
+        xcodebuild -scheme ${{ steps.vars.outputs.FRAMEWORK_NAME }} ONLY_ACTIVE_ARCH=NO OTHER_CFLAGS="-fembed-bitcode" -configuration 'Release' -sdk iphoneos clean build TARGET_BUILD_DIR=${{ steps.vars.outputs.IOS_OUTPUT_DIR }}
+        ls -al ${{ steps.vars.outputs.IOS_OUTPUT_DIR }}
+
+    - name: Upload build asset
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact
+        path: ${{ steps.vars.outputs.IOS_OUTPUT_DIR }}
+
+
+  download:
+    runs-on: ubuntu-latest
+
+    outputs:
+      IOS: ${{ steps.vars.outputs.IOS_RELEASE_FILE }}
+      ANDROID: ${{ steps.vars.outputs.ANDROID_RELEASE_FILE }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: variables
+      id: vars
+      run: |
+        echo ::set-output name=RELEASE_DOMAIN::https://sdkfiledl.jiguang.cn/build
+        echo ::set-output name=RELEASE_DIR::/tmp/releases
+        # get jiguang sdk version from package.json
+        version=$(cat package.json | grep jverification_sdk_release_version | head -n 1 | cut -d'"' -f4)
+        echo ::set-output name=SDK_RELEASE_VERSION::$version
+        echo ::set-output name=IOS_RELEASE_FILE::jverification-ios-$version-release
+        echo ::set-output name=ANDROID_RELEASE_FILE::jverification-android-release-$version
+
+    - name: New Folder
+      run: mkdir ${{ steps.vars.outputs.RELEASE_DIR }}
+
+    - name: Cache Releases
+      id: cache-releases
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.vars.outputs.RELEASE_DIR }}
+        key: ${{ runner.os }}-sdk-releases-${{ steps.vars.outputs.SDK_RELEASE_VERSION }}-v3
+
+    - name: download official sdk releases
+      if: steps.cache-releases.outputs.cache-hit != 'true'
+      run : |
+        cd ${{ steps.vars.outputs.RELEASE_DIR }}
+        curl -O ${{ steps.vars.outputs.RELEASE_DOMAIN }}/${{ steps.vars.outputs.IOS_RELEASE_FILE }}.zip
+        curl -O ${{ steps.vars.outputs.RELEASE_DOMAIN }}/${{ steps.vars.outputs.ANDROID_RELEASE_FILE }}.zip
+        ls -alh
+
+    - name: Upload SDK
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact
+        path: |
+          ${{ steps.vars.outputs.RELEASE_DIR }}/${{ steps.vars.outputs.IOS_RELEASE_FILE }}.zip
+          ${{ steps.vars.outputs.RELEASE_DIR }}/${{ steps.vars.outputs.ANDROID_RELEASE_FILE }}.zip
+
+
+  release:
+    needs: [download, build-ios, build-android]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: variables
+      id: vars
+      run: |
+        echo ::set-output name=DATA_DIR::/tmp/data
+        echo ::set-output name=DIST_DIR::/tmp/dist
+
+    - name: New Folder
+      run: mkdir -p ${{ steps.vars.outputs.DIST_DIR }}/android ${{ steps.vars.outputs.DIST_DIR }}/ios
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: ${{ steps.vars.outputs.DATA_DIR }}
+
+    - name: decompress official sdk releases
+      run: |
+        cd ${{ steps.vars.outputs.DATA_DIR }}/artifact
+        ls -al
+
+        unzip ${{ needs.download.outputs.IOS }}.zip
+        unzip ${{ needs.download.outputs.ANDROID }}.zip
+
+    - name: make releases
+      run: |
+        cd ${{ steps.vars.outputs.DATA_DIR }}/artifact
+        ls -al
+        cp $GITHUB_WORKSPACE/package.json ${{ steps.vars.outputs.DIST_DIR }}
+        mv ${{ needs.download.outputs.ANDROID }}/libs ${{ steps.vars.outputs.DIST_DIR }}/android
+        mv uniplugin_jverification-release.aar ${{ steps.vars.outputs.DIST_DIR }}/android
+        mv ${{ needs.download.outputs.IOS }}/Lib/* ${{ steps.vars.outputs.DIST_DIR }}/ios
+        mv UniPluginJVerification.framework ${{ steps.vars.outputs.DIST_DIR }}/ios
+        ls -al ${{ steps.vars.outputs.DIST_DIR }}/android
+        ls -al ${{ steps.vars.outputs.DIST_DIR }}/ios
+
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+    - name: Get the release asset
+      id: get_release_asset
+      run: echo ::set-output name=RELEASE_ASSERT::jverification-hbuilder-plugin-${{ steps.get_version.outputs.VERSION }}.zip
+
+    - name: Build project
+      run: |
+        cd ${{ steps.vars.outputs.DIST_DIR }}
+        zip -r ${{ steps.get_release_asset.outputs.RELEASE_ASSERT }} *
+        ls -al
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_version.outputs.VERSION }}
+        release_name: ${{ steps.get_version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: ${{ steps.vars.outputs.DIST_DIR }}/${{ steps.get_release_asset.outputs.RELEASE_ASSERT }}
+        asset_name: ${{ steps.get_release_asset.outputs.RELEASE_ASSERT }}
+        asset_content_type: application/zip
