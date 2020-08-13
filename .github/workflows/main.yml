@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  build-android:
+  android:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,8 +44,11 @@ jobs:
         path: ${{ steps.vars.outputs.ANDROID_OUTPUT_DIR }}
 
 
-  build-ios:
+  ios:
     runs-on: macOS-latest
+
+    outputs:
+      SDK_VER: ${{ steps.vars.outputs.SDK_RELEASE_VERSION }}
 
     steps:
     - uses: actions/checkout@v2
@@ -56,10 +59,15 @@ jobs:
         # echo ::set-output name=PROJECTNAME::HBuilder-uniPlugin
         echo ::set-output name=FRAMEWORK_NAME::UniPluginJVerification
         echo ::set-output name=ASSERTS_DIR::$GITHUB_WORKSPACE/assets
-        # get hbuilder sdk filename for ios from package.json
-        echo ::set-output name=HBUILDER_SDK_IOS::$(cat package.json | grep hbuilder_sdk_ios | head -n 1 | cut -d'"' -f4)
         echo ::set-output name=IOS_OUTPUT_DIR::/tmp/build
         echo ::set-output name=IOS_WORK_DIR::$GITHUB_WORKSPACE/UniPlugin-JVerification-iOS
+
+        # get hbuilder sdk filename for ios from package.json
+        echo ::set-output name=HBUILDER_SDK_IOS::$(cat package.json | grep hbuilder_sdk_ios | head -n 1 | cut -d'"' -f4)
+
+        # get jiguang sdk version from package.json
+        version=$(cat package.json | grep jverification_sdk_release_version | head -n 1 | cut -d'"' -f4)
+        echo ::set-output name=SDK_RELEASE_VERSION::$version
 
     - name: New Folder
       run: mkdir ${{ steps.vars.outputs.IOS_OUTPUT_DIR }}
@@ -83,24 +91,22 @@ jobs:
 
 
   download:
+    needs: [ios]
     runs-on: macOS-latest
 
     outputs:
       IOS: ${{ steps.vars.outputs.IOS_RELEASE_FILE }}
       ANDROID: ${{ steps.vars.outputs.ANDROID_RELEASE_FILE }}
-    steps:
-    - uses: actions/checkout@v2
 
+    steps:
     - name: variables
       id: vars
       run: |
         echo ::set-output name=RELEASE_DOMAIN::https://sdkfiledl.jiguang.cn/build
-        echo ::set-output name=RELEASE_DIR::/tmp/releases
-        # get jiguang sdk version from package.json
-        version=$(cat package.json | grep jverification_sdk_release_version | head -n 1 | cut -d'"' -f4)
-        echo ::set-output name=SDK_RELEASE_VERSION::$version
-        echo ::set-output name=IOS_RELEASE_FILE::jverification-ios-$version-release
-        echo ::set-output name=ANDROID_RELEASE_FILE::jverification-android-release-$version
+        echo ::set-output name=RELEASE_DIR::$HOME/releases
+        echo ::set-output name=SDK_RELEASE_VERSION::${{ needs.ios.outputs.SDK_VER }}
+        echo ::set-output name=IOS_RELEASE_FILE::jverification-ios-${{ needs.ios.outputs.SDK_VER }}-release
+        echo ::set-output name=ANDROID_RELEASE_FILE::jverification-android-release-${{ needs.ios.outputs.SDK_VER }}
 
     - name: New Folder
       run: mkdir ${{ steps.vars.outputs.RELEASE_DIR }}
@@ -110,7 +116,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ steps.vars.outputs.RELEASE_DIR }}
-        key: ${{ runner.os }}-sdk-releases-${{ steps.vars.outputs.SDK_RELEASE_VERSION }}-v3
+        key: ${{ runner.os }}-sdk-releases-${{ steps.vars.outputs.SDK_RELEASE_VERSION }}-v1
 
     - name: download official sdk releases
       if: steps.cache-releases.outputs.cache-hit != 'true'
@@ -139,9 +145,9 @@ jobs:
     - name: compress ios sdk back
       if: steps.cache-releases.outputs.cache-hit != 'true'
       run : |
-        cd ${{ steps.vars.outputs.RELEASE_DIR }}/${{ steps.vars.outputs.IOS_RELEASE_FILE }}
-        zip -r ${{ steps.vars.outputs.IOS_RELEASE_FILE }}.zip *
-        ls -alh ../
+        cd ${{ steps.vars.outputs.RELEASE_DIR }}
+        zip -r ${{ steps.vars.outputs.IOS_RELEASE_FILE }}.zip ${{ steps.vars.outputs.IOS_RELEASE_FILE }}
+        ls -alh
 
     - name: Upload SDK
       uses: actions/upload-artifact@v2
@@ -153,7 +159,7 @@ jobs:
 
 
   release:
-    needs: [download, build-ios, build-android]
+    needs: [download, ios, android]
     runs-on: ubuntu-latest
 
     steps:
