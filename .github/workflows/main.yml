@@ -120,7 +120,7 @@ jobs:
         curl -O ${{ steps.vars.outputs.RELEASE_DOMAIN }}/${{ steps.vars.outputs.ANDROID_RELEASE_FILE }}.zip
         ls -alh
 
-     - name: unzip ios sdk
+    - name: unzip ios sdk
       if: steps.cache-releases.outputs.cache-hit != 'true'
       run : |
         cd ${{ steps.vars.outputs.RELEASE_DIR }}
