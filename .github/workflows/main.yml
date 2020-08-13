@@ -83,7 +83,7 @@ jobs:
 
 
   download:
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
 
     outputs:
       IOS: ${{ steps.vars.outputs.IOS_RELEASE_FILE }}
@@ -119,6 +119,29 @@ jobs:
         curl -O ${{ steps.vars.outputs.RELEASE_DOMAIN }}/${{ steps.vars.outputs.IOS_RELEASE_FILE }}.zip
         curl -O ${{ steps.vars.outputs.RELEASE_DOMAIN }}/${{ steps.vars.outputs.ANDROID_RELEASE_FILE }}.zip
         ls -alh
+
+     - name: unzip ios sdk
+      if: steps.cache-releases.outputs.cache-hit != 'true'
+      run : |
+        cd ${{ steps.vars.outputs.RELEASE_DIR }}
+        unzip ${{ steps.vars.outputs.IOS_RELEASE_FILE }}.zip
+        rm ${{ steps.vars.outputs.IOS_RELEASE_FILE }}.zip
+        ls -alh
+
+    - name: reduce ios sdk package size
+      if: steps.cache-releases.outputs.cache-hit != 'true'
+      run : |
+        cd ${{ steps.vars.outputs.RELEASE_DIR }}/${{ steps.vars.outputs.IOS_RELEASE_FILE }}/Lib
+        sudo xcode-select -switch /Applications/Xcode_11.6.app
+        lipo -remove armv7s jcore-ios-*.a -o jcore-ios-*.a
+        lipo -remove armv7s jverification-ios-*.a -o jverification-ios-*.a
+
+    - name: compress ios sdk back
+      if: steps.cache-releases.outputs.cache-hit != 'true'
+      run : |
+        cd ${{ steps.vars.outputs.RELEASE_DIR }}/${{ steps.vars.outputs.IOS_RELEASE_FILE }}
+        zip -r ${{ steps.vars.outputs.IOS_RELEASE_FILE }}.zip *
+        ls -alh ../
 
     - name: Upload SDK
       uses: actions/upload-artifact@v2
